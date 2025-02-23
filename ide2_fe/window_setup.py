@@ -1,4 +1,4 @@
-from PyQt6.QtCore import QSize, Qt
+from PyQt6.QtCore import QSize, Qt, QTimer
 from PyQt6.QtWidgets import *
 
 #Heavy lifting happens here
@@ -6,6 +6,8 @@ class MainIdeWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+
+        self.curr_file_name = ""
 
         self.setWindowTitle("Reactive IDE")
 
@@ -24,9 +26,9 @@ class MainIdeWindow(QMainWindow):
         import_button.clicked.connect(self.import_button_clicked)
 
 
-        save_button = QPushButton()
-        save_button.setText("Save") 
-        save_button.clicked.connect(self.save_button_clicked)
+        self.save_button = QPushButton()
+        self.save_button.setText("Save") 
+        self.save_button.clicked.connect(self.save_button_clicked)
 
         # Tabulation for files
         edit_window.addTab(self.editor, "First Tab") #class attribute 
@@ -34,7 +36,7 @@ class MainIdeWindow(QMainWindow):
         #Horizontal splitter for buttons (import, save, etc.)
         buttons_split = QSplitter(Qt.Orientation.Horizontal)
         buttons_split.addWidget(import_button)
-        buttons_split.addWidget(save_button)
+        buttons_split.addWidget(self.save_button)
 
         #Add vertical splitter for left side (buttons + file directories)
         left_split = QSplitter(Qt.Orientation.Vertical)
@@ -68,12 +70,23 @@ class MainIdeWindow(QMainWindow):
         if file_name:
             with open(file_name, "r", encoding="utf-8") as file:
                 self.editor.setText(file.read())
+            self.curr_file_name #save the file name for later (so user doesn't have to reselect it when saving)
 
     def save_button_clicked(self):
         print("Trigger save")
-        file_name, _ = QFileDialog.getSaveFileName(self, "Save File", "", "Python Files (*.py);;All Files (*)")
+        
+        file_name, _ = QFileDialog.getSaveFileName(self, "Save File", self.curr_file_name, "Python Files (*.py);;All Files (*)")
+        
         if file_name:
             with open(file_name, "w", encoding="utf-8") as file:
-                #print("Saving...")
-                #print(self.editor.toPlainText())
                 file.write(self.editor.toPlainText())
+            
+            self.save_button.setText("Saved!!")
+
+            # Reverts back to "Save" after 5 seconds
+            QTimer.singleShot(5000, lambda: self.save_button.setText("Save"))
+      
+            
+
+        
+                
