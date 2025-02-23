@@ -1,49 +1,21 @@
+from PyQt6.QtWidgets import QApplication, QWidget
+from window_setup import MainIdeWindow
+
+# Only needed for access to command line arguments
 import sys
-from PyQt6.QtWidgets import QApplication, QMainWindow, QTextEdit, QFileDialog
-from PyQt6.QtGui import QAction, QTextCharFormat, QColor, QSyntaxHighlighter
-from tree_sitter import Language, Parser
 
-class TextEditor(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.text_edit = QTextEdit(self)
-        self.setCentralWidget(self.text_edit)
-        self.init_ui()
+# You need one (and only one) QApplication instance per application.
+# Pass in sys.argv to allow command line arguments for your app.
+# If you know you won't use command line arguments QApplication([]) works too.
+app = QApplication([])
 
-    def init_ui(self):
-        self.setWindowTitle("PyQt6 Text Editor with Tree-sitter")
-        self.resize(800, 600)
+# Create a Qt widget, which will be our window.
+window = MainIdeWindow()
+window.show()  # IMPORTANT!!!!! Windows are hidden by default.
 
-        menubar = self.menuBar()
-        file_menu = menubar.addMenu("File")
-
-        open_action = QAction("Open", self)
-        open_action.triggered.connect(self.open_file)
-        file_menu.addAction(open_action)
-
-        save_action = QAction("Save", self)
-        save_action.triggered.connect(self.save_file)
-        file_menu.addAction(save_action)
-
-        exit_action = QAction("Exit", self)
-        exit_action.triggered.connect(self.close)
-        file_menu.addAction(exit_action)
-
-    def open_file(self):
-        file_name, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Python Files (*.py);;All Files (*)")
-        if file_name:
-            with open(file_name, "r", encoding="utf-8") as file:
-                self.text_edit.setText(file.read())
-
-    def save_file(self):
-        file_name, _ = QFileDialog.getSaveFileName(self, "Save File", "", "Python Files (*.py);;All Files (*)")
-        if file_name:
-            with open(file_name, "w", encoding="utf-8") as file:
-                file.write(self.text_edit.toPlainText())
+# Start the event loop.
+app.exec()
 
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    editor = TextEditor()
-    editor.show()
-    sys.exit(app.exec())
+# Your application won't reach here until you exit and the event
+# loop has stopped.
