@@ -1,5 +1,6 @@
-from PyQt6.QtCore import QSize, Qt, QTimer
+from PyQt6.QtCore import QSize, Qt, QTimer, QUrl
 from PyQt6.QtWidgets import *
+from PyQt6.QtWebEngineWidgets import *
 
 #Heavy lifting happens here
 class MainIdeWindow(QMainWindow):   
@@ -20,11 +21,13 @@ class MainIdeWindow(QMainWindow):
 
         edit_window = QTabWidget()
         term_window = QTabWidget()
+        
+        web_view = QWebEngineView()
+        web_view.setUrl(QUrl("http://localhost:3003"))
 
         import_button = QPushButton()
         import_button.setText("Import File or Folder")
         import_button.clicked.connect(self.import_button_clicked)
-
 
         self.save_button = QPushButton()
         self.save_button.setText("Save") 
@@ -46,8 +49,9 @@ class MainIdeWindow(QMainWindow):
          # Add vertical splitter for terminal  
         right_split = QSplitter(Qt.Orientation.Vertical)
         right_split.addWidget(edit_window)
-        right_split.addWidget(term_window)
-        right_split.setSizes([500, 50])
+        #right_split.addWidget(term_window)
+        right_split.addWidget(web_view)
+        right_split.setSizes([500, 500])
 
         # Add a splitter layout
         vert_split = QSplitter(Qt.Orientation.Horizontal)
