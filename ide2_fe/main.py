@@ -3,36 +3,12 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QTextEdit, QFileDialog
 from PyQt6.QtGui import QAction, QTextCharFormat, QColor, QSyntaxHighlighter
 from tree_sitter import Language, Parser
 
-# Load Tree-sitter Language (Ensure you compiled it first)
-LANGUAGE = Language("tree-sitter-python.so", "python")
-parser = Parser()
-parser.set_language(LANGUAGE)
-
-
-class SyntaxHighlighter(QSyntaxHighlighter):
-    def highlightBlock(self, text):
-        # Parse the text using Tree-sitter
-        tree = parser.parse(bytes(text, "utf8"))
-        root_node = tree.root_node
-
-        # Highlight keywords
-        keyword_format = QTextCharFormat()
-        keyword_format.setForeground(QColor("blue"))
-
-        for node in root_node.children:
-            if node.type in ["keyword", "function_definition"]:
-                self.setFormat(node.start_byte, node.end_byte - node.start_byte, keyword_format)
-
-
 class TextEditor(QMainWindow):
     def __init__(self):
         super().__init__()
         self.text_edit = QTextEdit(self)
         self.setCentralWidget(self.text_edit)
         self.init_ui()
-
-        # Apply syntax highlighting
-        self.highlighter = SyntaxHighlighter(self.text_edit.document())
 
     def init_ui(self):
         self.setWindowTitle("PyQt6 Text Editor with Tree-sitter")
